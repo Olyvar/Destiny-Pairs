@@ -1,33 +1,23 @@
-// ---------- MODEL ----------- \\
-
 var pairs = [
     {name: "crotas-end", url: "pairs-images/crotas-end.jpg"},
     {name: "nightstalker", url: "pairs-images/nightstalker.jpg"},
     {name: "handcannon", url: "pairs-images/handcannon.jpg"},
-    {name: "handcannon", url: "pairs-images/handcannon.jpg"},
-    {name: "nightstalker", url: "pairs-images/nightstalker.jpg"},
     {name: "hunter", url: "pairs-images/hunter.jpg"},
     {name: "guardians", url: "pairs-images/guardians.jpg"},
-    {name: "main-destiny", url: "pairs-images/main-destiny.jpg"},
-    {name: "hunter", url: "pairs-images/hunter.jpg"},
-    {name: "guardians", url: "pairs-images/guardians.jpg"},
-    {name: "main-destiny", url: "pairs-images/main-destiny.jpg"},
-    {name: "crotas-end", url: "pairs-images/crotas-end.jpg"}
+    {name: "main-destiny", url: "pairs-images/main-destiny.jpg"}
 ];
 
-// ----------- CONTROLLER ----------- \\
+// Duplicate each object
+pairs.forEach(function(v,i,arr){
+    arr.push(v);
+});
 
-
-
-// ----------- VIEW -------------\\
 
 function startGame() {
 
-    // configurable game timer
     var gameTime = 60;
 
-
-    //--- countdown timer ---//
+    //--- timer functionality ---//
     var timer = document.getElementById('js-timer');
     timer.innerHTML = gameTime;
     var mask = document.querySelector(".mask");
@@ -55,44 +45,37 @@ function startGame() {
 
     countDown(gameTime);
 
+    // ----------- VIEW -------------\\
 
     var cardTemplate = "<div class='flip-container'><div class='flipper'><div class='back'></div><div class='front'></div></div></div>";
-
     var view = document.getElementById("view");
-    var cards = "";
-
+    var cardsHtmlString = "";
     var pairsRemaining = (pairs.length / 2);
     var pairsRemainingContainer = document.getElementById("js-pairs-remaining");
     pairsRemainingContainer.innerHTML = pairsRemaining;
 
-
-
-
     pairs.forEach(function () {
-        cards += cardTemplate;
+        cardsHtmlString += cardTemplate;
     });
 
-    view.innerHTML = cards;
+    view.innerHTML = cardsHtmlString;
 
     var allCards = document.querySelectorAll(".flip-container");
+    var shuffledPairs = shuffle(pairs);
 
-    function checkAttributes(cardOneVal, cardTwoVal, elements) {
-        if (cardOneVal === cardTwoVal) {
-            elements.forEach(function (v) {
-                v.classList.add("fade-out");
-                v.removeEventListener("click", cardFlipAndCheck);
-            });
+    // Loop over cards, adding the correct background image, correct custom attribute, and adding the event listener to flip the card
 
-            pairsRemaining--;
-            pairsRemainingContainer.innerHTML = pairsRemaining;
-            if(pairsRemaining === 0){
-                gameWon(gameTime);
-            }
-        } else {
-            elements.forEach(function (v) {
-                v.classList.toggle("flip");
-            })
-        }
+    for (var i = 0; i < allCards.length; i++) {
+        allCards[i].setAttribute("card", shuffledPairs[i].name);
+        allCards[i].firstChild.lastChild.style.backgroundImage = "url('" + shuffledPairs[i].url + "')";
+        allCards[i].addEventListener("click", cardFlipAndCheck);
+    }
+
+    // function to run when card is clicked
+    function cardFlipAndCheck(e) {
+        e.currentTarget.classList.toggle("flip");
+        // Run card flip function passing the value of the custom attribute to the two temp vars to check the pairs
+        twoCardsFlipped(e.currentTarget.getAttribute("card"), e.currentTarget);
     }
 
     var tempCardArray = [];
@@ -104,34 +87,39 @@ function startGame() {
         elements.push(element);
         cardsFlipped++;
 
-        if (cardsFlipped === 2) {
-            //
+        if(cardsFlipped === 2) {
+
             setTimeout(checkAttributes, 700, tempCardArray[0], tempCardArray[1], elements);
 
-            // reset variables
+            // reset temporary variables
             elements = [];
             tempCardArray = [];
             cardsFlipped = 0;
         }
     }
 
-// function to run when card is clicked
-    var cardFlipAndCheck = function (e) {
-        e.target.parentNode.parentNode.classList.toggle("flip");
-        // Run card flip function passing the value of the custom attribute to the two temp vars to check the pairs
-        twoCardsFlipped(e.target.parentNode.parentNode.getAttribute("card"), e.target.parentNode.parentNode);
+    function checkAttributes(cardOneVal, cardTwoVal, elements) {
+        if (cardOneVal === cardTwoVal) {
+            elements.forEach(function (pair) {
+                pair.classList.add("fade-out");
+                pair.removeEventListener("click", cardFlipAndCheck);
+            });
+
+            pairsRemaining--;
+            pairsRemainingContainer.innerHTML = pairsRemaining;
+
+            if (pairsRemaining === 0) {
+                gameWon(gameTime);
+            }
+
+        } else {
+            elements.forEach(function (card) {
+                card.classList.toggle("flip");
+            });
+        }
     }
 
-// Loop over cards, adding the correct background image, correct custom attribute, and adding the event listener to flip the card
-    for (var i = 0; i < allCards.length; i++) {
-        allCards[i].setAttribute("card", pairs[i].name);
-        allCards[i].firstChild.lastChild.style.backgroundImage = "url('" + pairs[i].url + "')";
-        allCards[i].addEventListener("click", cardFlipAndCheck);
-    }
-
-
-
-    function gameWon(timeRemaining){
+    function gameWon(timeRemaining) {
         mask.classList.remove("hidden");
         mask.firstElementChild.nextElementSibling.classList.remove("hidden");
         timeRemainingContainer.innerHTML = timeRemaining;
@@ -142,12 +130,41 @@ function startGame() {
 
 startGame();
 
-var restartBtn = document.getElementById("js-restart");
-restartBtn.addEventListener("click", function(e){
+
+// Restart game functionality
+
+var restartBtn = document.querySelectorAll(".js-restart");
+
+for(var i =0; i < restartBtn.length; i++){
+    restartBtn[i].addEventListener("click", restartGame)
+}
+
+function restartGame(e){
     e.target.parentNode.parentNode.classList.add("hidden");
     startGame();
-});
+}
 
+
+
+// third-party shuffle array function
+
+function shuffle(array) {
+    var m = array.length, t, i;
+
+    // While there remain elements to shuffle…
+    while (m) {
+
+        // Pick a remaining element…
+        i = Math.floor(Math.random() * m--);
+
+        // And swap it with the current element.
+        t = array[m];
+        array[m] = array[i];
+        array[i] = t;
+    }
+
+    return array;
+}
 
 
 	
