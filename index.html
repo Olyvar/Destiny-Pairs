@@ -3,24 +3,24 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Pairs</title>
-<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200, 400' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200, 400' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="hud"><strong>Time remaining:</strong> <span id="js-timer" class="hud-counter"></span> <strong>Pairs remaining:</strong> <span id="js-pairs-remaining"></span></div>
-
-<div id="view" class="container">
-
-
+<div class="hud">
+	<strong>Time remaining:</strong> <span id="js-timer" class="hud-counter"></span>
+	<strong>Pairs remaining:</strong> <span id="js-pairs-remaining"></span>
 </div>
 
+<div id="view" class="container">
+</div>
 
 <div class="mask hidden">
 	<div class="caption-gameover hidden">
-	<h1>GAME OVER!</h1>
+		<h1>GAME OVER!</h1>
 
-	<a class="js-restart restart-btn btn">Start again</a>
+		<a class="js-restart restart-btn btn">Start again</a>
 
 	</div>
 
@@ -33,7 +33,20 @@
 	</div>
 </div>
 
-<script src="pairs.js"></script>	
+<script src="pairs.js"></script>
+
+<script>
+
+pairsApp.init([
+	{name: "crotas-end", url: "pairs-images/crotas-end.jpg"},
+	{name: "nightstalker", url: "pairs-images/nightstalker.jpg"},
+	{name: "handcannon", url: "pairs-images/handcannon.jpg"},
+	{name: "hunter", url: "pairs-images/hunter.jpg"},
+	{name: "guardians", url: "pairs-images/guardians.jpg"},
+	{name: "main-destiny", url: "pairs-images/main-destiny.jpg"}
+]);
+
+</script>
 
 </body>
 </html>
