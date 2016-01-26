@@ -6,7 +6,7 @@
 }
 
 body{
-	background-color: #0d1b30;
+	background: url(pairs-images/stardust.png);
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 1.6em;
 	text-align: center;
@@ -27,10 +27,11 @@ p{
 
 .container{
 	margin: 15px auto 0;
-	width: 1724px;
+	width: 1726px;
 	padding: 20px 20px 0;
 	background: #ddd;
-	box-shadow: inset 0px 0px 100px 25px #0d1b30;
+	border: 1px solid #555;
+	box-shadow: inset 0 0 100px 25px #0d1b30;
 }
 
 .container:after {
