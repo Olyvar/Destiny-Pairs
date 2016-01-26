@@ -1,4 +1,4 @@
-var pairsApp = {
+var pairsGame = {
 
     init: function(pairs) {
 
@@ -11,36 +11,7 @@ var pairsApp = {
                 });
             }
 
-            // Timer functionality
-            var timer = document.getElementById('js-timer');
-            var gameTime = 60;
-            timer.innerHTML = gameTime;
-            var mask = document.querySelector(".mask");
-            var timeRemainingContainer = document.getElementById("js-time-remaining");
-
-            // Define interval variable here to give us access to it later
-            var int;
-
-            function countDown(i) {
-                int = setInterval(function () {
-                    i--;
-                    document.getElementById('js-timer').innerHTML = i;
-
-                    // Need to track gameTime to output it when game is won
-                    gameTime = i;
-
-                    // Out of time if statement
-                    if (i === 0) {
-                        clearInterval(int);
-                        mask.classList.remove("hidden");
-                        mask.firstElementChild.classList.remove("hidden");
-                    }
-                }, 1000);
-            }
-
-            countDown(gameTime);
-
-            // ----------- VIEW -------------\\
+            // ----------- Set up View -------------\\
 
             var cardTemplate = "<div class='flip-container'><div class='flipper'><div class='back'></div><div class='front'></div></div></div>";
             var view = document.getElementById("view");
@@ -120,6 +91,35 @@ var pairsApp = {
                 timeRemainingContainer.innerHTML = timeRemaining;
                 clearInterval(int);
             }
+
+            // Timer functionality
+            var timer = document.getElementById('js-timer');
+            var gameTime = 60;
+            timer.innerHTML = gameTime;
+            var mask = document.querySelector(".mask");
+            var timeRemainingContainer = document.getElementById("js-time-remaining");
+
+            // Define interval variable here to give us access to it later
+            var int;
+
+            function countDown(i) {
+                int = setInterval(function () {
+                    i--;
+                    document.getElementById('js-timer').innerHTML = i;
+
+                    // Need to track gameTime to output it when game is won
+                    gameTime = i;
+
+                    // Out of time if statement
+                    if (i === 0) {
+                        clearInterval(int);
+                        mask.classList.remove("hidden");
+                        mask.firstElementChild.classList.remove("hidden");
+                    }
+                }, 1000);
+            }
+
+            countDown(gameTime);
 
         }
 
