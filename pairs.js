@@ -1,10 +1,11 @@
 "use strict";
 
+// Create firebase reference
+var leaderboardRef = new Firebase("https://destiny-pairs.firebaseio.com/");
+
 var pairsGame = {
 
     init: function(pairs) {
-
-
 
         pairs.forEach(function (obj) {
             pairs.push(obj);
@@ -22,6 +23,28 @@ var pairsGame = {
 
         function startGame(pairs, username) {
 
+            // retrieve leaderboard from FB and build
+
+            var tableHeader = document.querySelector('.table-header');
+            var tableFooter = document.querySelector('.table-footer');
+            var leaderboardTable = tableHeader.parentNode;
+
+            leaderboardRef.orderByChild("score").once("value", function(snapshot){
+
+                var htmlString = ""
+
+                snapshot.forEach(function(data){
+                    var leaderboardRow = document.createElement('tr');
+                    htmlString = buildLeaderboard(data);
+                    leaderboardRow.innerHTML = htmlString;
+                    leaderboardTable.insertBefore(leaderboardRow, tableHeader.nextSibling);
+                });
+
+
+            });
+
+
+
             var mask = document.querySelector(".mask");
             hide(mask);
             hide(firstScreen);
@@ -36,7 +59,7 @@ var pairsGame = {
             var endScoreContainer = document.getElementById("js-end-score");
             updateScore();
 
-            var pairsRemaining = pairs.length / 2;
+            var pairsRemaining = 1;
             var pairsRemainingContainer = document.getElementById("js-pairs-remaining");
             pairsRemainingContainer.innerHTML = pairsRemaining;
 
@@ -176,33 +199,32 @@ var pairsGame = {
                 startGame(pairs, username);
             }
 
-            var leaderboard = [];
-
             function addToLeaderboardArray(){
-                leaderboard.push({
+                var leaderboardObj = {
                     username: username,
                     score: score,
                     timeRemaining: gameTime
-                });
-
+                }
+                leaderboardRef.push(leaderboardObj);
                 updateLeaderboard();
             }
 
-            var leaderboardRow = document.createElement('tr');
-            var tableFooter = document.querySelector('.table-footer');
-            var leaderboardTable = tableFooter.parentNode;
 
             function updateLeaderboard(){
-                var htmlString = "";
-                leaderboard.map(function(obj){
-                    htmlString = "<td>" + obj.username + "</td>" + "<td>" + obj.score +"</td><td>" + obj.timeRemaining + " Seconds</td>";
-                    return htmlString;
-                }).join("");
-
-                leaderboardRow.innerHTML = htmlString;
+                var leaderboardRow = document.createElement('tr');
+                leaderboardRef.endAt().limitToLast(1).on("child_added", function(snapshot) {
+                    leaderboardRow.innerHTML = buildLeaderboard(snapshot);
+                });
                 leaderboardTable.insertBefore(leaderboardRow, tableFooter);
-
             }
+
+            function buildLeaderboard(snapshot){
+                var newRow = snapshot.val();
+                var htmlString = "<td>" + newRow.username + "</td>" + "<td>" + newRow.score +"</td><td>" + newRow.timeRemaining + " Seconds</td>";
+                return htmlString;
+            }
+
+
 
         }
 
