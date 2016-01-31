@@ -6,30 +6,67 @@
 	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200, 400' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
 <div class="hud">
-	<strong>Time remaining:</strong> <span id="js-timer" class="hud-counter"></span>
-	<strong>Pairs remaining:</strong> <span id="js-pairs-remaining"></span>
+	<span class="hud-item">
+		<strong>Time remaining:</strong> <span id="js-timer"></span>
+	</span>
+	<span class="hud-item">
+		<strong>Pairs remaining:</strong> <span id="js-pairs-remaining"></span>
+	</span>
+	<span class="hud-item">
+		<strong>Score:</strong> <span id="js-score"></span>
+	</span>
 </div>
 
 <div id="view" class="container">
 </div>
 
-<div class="mask hidden">
-	<div class="caption-gameover hidden">
+<div class="mask">
+	<div class="caption-game-start">
+		<p>Welcome to Destiny Pairs, insert your name and hit start to begin</p>
+		<input id="js-username" type="text" title="username"> <a class="js-start-btn btn">Start Game</a>
+	</div>
+	<div class="caption-game-lost hidden">
 		<h1>GAME OVER!</h1>
 
 		<a class="js-restart restart-btn btn">Start again</a>
 
 	</div>
 
-	<div class="caption-gamewon hidden">
+	<div class="caption-game-won hidden">
 		<h1>YOU WIN!</h1>
 
 		<p>You finished with <span id="js-time-remaining"></span> seconds left</p>
 
+		<p><strong>Score:</strong> <span id="js-end-score"></span></p>
+
 		<a class="js-restart restart-btn btn">Start again</a>
+
+		<div class="leaderboard-container">
+			<h2>Leaderboard</h2>
+
+			<table class="leaderboard">
+				<tr>
+					<th>Username</th>
+					<th>Score</th>
+					<th>Time Remaining</th>
+				</tr>
+				<tr class="table-footer">
+				</tr>
+			</table>
+		</div>
+
+	</div>
+</div>
+
+<div class="flip-container-template">
+	<div class='flip-container'>
+		<div class='flipper'>
+			<div class='back'></div>
+			<div class='front'></div>
+		</div>
 	</div>
 </div>
 

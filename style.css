@@ -22,12 +22,13 @@ strong{
 }
 
 p{
-	margin-bottom:2em;
+	font-size: 1.5em;
+	margin-bottom: 1em;
 }
 
 .container{
 	margin: 15px auto 0;
-	width: 1726px;
+	width: 1730px;
 	padding: 20px 20px 0;
 	background: #ddd;
 	border: 1px solid #555;
@@ -63,6 +64,10 @@ p{
 	perspective: 1000px;
 	transition: opacity 0.3s ease;
 	opacity: 1;
+}
+
+.flip-container-template{
+	display: none;
 }
 
 .fade-out{
@@ -110,7 +115,7 @@ p{
 	display: inline-block;
 }
 
-.hud-counter{
+.hud-item{
 	margin-right: 20px;
 }
 
@@ -118,10 +123,12 @@ p{
 	height: 100%;
 	width: 100%;
 	background-color: rgba(0,0,0,0.9);
+	margin-left: -8px;
 	position: fixed;
 	z-index: 100;
 	top: 0;
 	transition: opacity 1s ease;
+	overflow-y: scroll;
 }
 
 .hidden{
@@ -135,14 +142,19 @@ p{
 	opacity: 1;	
 }
 
-.restart-btn{
-	border: 3px solid white;
-	background-color: rgba(13, 27, 48, 0.5);
-	color: white;
+input{
+	width: 30%;
+	padding: 0.5em;
+	background-color: rgba(13,27,48,0.5);
 	transition: background-color .4s ease;
+	margin: 0 auto 1em;
+	display: block;
+	border: 2px white solid;
+	color: white;
+	font-size: 2em;
 }
 
-.restart-btn:hover{
+input:focus{
 	background-color: rgba(13,27,48, 1);
 }
 
@@ -150,13 +162,42 @@ p{
 	padding: 20px 30px;
 	cursor: pointer;
 	display: inline-block;
+	border: 3px solid white;
+	background-color: rgba(13, 27, 48, 0.5);
+	color: white;
+	transition: background-color .4s ease;
 }
 
-.caption-gameover,.caption-gamewon{
-	margin-top: 300px;
+.btn:hover{
+	background-color: rgba(13,27,48, 1);
 }
 
 h1{
 	margin-bottom: 1em;
 	font-weight: 400;
+}
+
+.caption-game-won{
+	padding-top: 50px;
+}
+
+.caption-game-lost, .caption-game-start{
+	padding-top: 300px;
+}
+
+.leaderboard{
+	border-spacing:0;
+	background-color: rgba(255,255,255,0.075);
+	margin: 0 auto;
+}
+
+.leaderboard-container{
+	margin: 50px auto 0;
+	border-top:5px solid rgba(255,255,255,0.25);
+	width:50%;
+}
+
+td,th{
+	border: 1px solid white;
+	padding: 0.4em;
 }

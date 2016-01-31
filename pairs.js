@@ -1,146 +1,216 @@
+"use strict";
+
 var pairsGame = {
 
     init: function(pairs) {
 
-        function startGame(pairs, firstPlay) {
 
-            // Duplicate each object if this is the first time
-            if(firstPlay) {
-                pairs.forEach(function (v, i, arr) {
-                    arr.push(v);
-                });
-            }
 
-            // ----------- Set up View -------------\\
+        pairs.forEach(function (obj) {
+            pairs.push(obj);
+        });
 
-            var cardTemplate = "<div class='flip-container'><div class='flipper'><div class='back'></div><div class='front'></div></div></div>";
+        var usernameInput = document.getElementById("js-username");
+        var startButton = document.querySelector(".js-start-btn");
+        var firstScreen = document.querySelector(".caption-game-start");
+        startButton.addEventListener("click", enterName);
+
+        function enterName(){
+            var username = usernameInput.value;
+            startGame(pairs, username);
+        }
+
+        function startGame(pairs, username) {
+
+            var mask = document.querySelector(".mask");
+            hide(mask);
+            hide(firstScreen);
+
+            var shuffledPairs = shuffle(pairs);
+
+            // ----------- Set up Variables -------------\\
+            var gameTime = 60;
+            var score = 10000;
             var view = document.getElementById("view");
-            var cardsHtmlString = "";
-            var pairsRemaining = (pairs.length / 2);
+            var scoreContainer = document.getElementById("js-score");
+            var endScoreContainer = document.getElementById("js-end-score");
+            updateScore();
+
+            var pairsRemaining = 1;
             var pairsRemainingContainer = document.getElementById("js-pairs-remaining");
             pairsRemainingContainer.innerHTML = pairsRemaining;
 
-            pairs.forEach(function () {
-                cardsHtmlString += cardTemplate;
-            });
+            var flipContainer = document.querySelector(".flip-container-template").querySelector(".flip-container");
 
-            view.innerHTML = cardsHtmlString;
+            // build cards and immediately render
+            view.innerHTML = shuffledPairs.map(function(card){
+                flipContainer.setAttribute("card", card.name);
+                flipContainer.querySelector(".front").style.backgroundImage = "url('" + card.url + "')";
+                return flipContainer.outerHTML;
+            }).join("");
 
-            var allCards = document.querySelectorAll(".flip-container");
-            var shuffledPairs = shuffle(pairs);
+            var renderedCards = document.querySelectorAll(".flip-container");
 
-            // Loop over cards, adding the correct background image, correct custom attribute, and adding the event listener to flip the card
-
-            for (var i = 0; i < allCards.length; i++) {
-                allCards[i].setAttribute("card", shuffledPairs[i].name);
-                allCards[i].firstChild.lastChild.style.backgroundImage = "url('" + shuffledPairs[i].url + "')";
-                allCards[i].addEventListener("click", cardFlipAndCheck);
+            for (var i = 0; i < renderedCards.length; i++) {
+                renderedCards[i].addEventListener("click", cardFlipAndCheck);
             }
 
             // function to run when card is clicked
             function cardFlipAndCheck(e) {
+                // check if you are clicking the same card
+                if(e.currentTarget.classList.contains("flip")){
+                    return;
+                }
                 e.currentTarget.classList.toggle("flip");
-                // Run card flip function passing the value of the custom attribute to the two temp vars to check the pairs
-                twoCardsFlipped(e.currentTarget.getAttribute("card"), e.currentTarget);
+                // Run card flip function element
+                twoCardsFlipped(e.currentTarget);
             }
 
-            var tempCardArray = [];
             var elements = [];
             var cardsFlipped = 0;
 
-            function twoCardsFlipped(customAttribute, element) {
-                tempCardArray.push(customAttribute);
+            function twoCardsFlipped(element) {
                 elements.push(element);
                 cardsFlipped++;
 
                 if (cardsFlipped === 2) {
 
-                    setTimeout(checkAttributes, 700, tempCardArray[0], tempCardArray[1], elements);
+                    setTimeout(checkAttributes, 700, elements);
 
                     // Reset temporary variables
                     elements = [];
-                    tempCardArray = [];
                     cardsFlipped = 0;
-                }
-
-                function checkAttributes(cardOneVal, cardTwoVal, elements) {
-                    if (cardOneVal === cardTwoVal) {
-                        elements.forEach(function (pair) {
-                            pair.classList.add("fade-out");
-                            pair.removeEventListener("click", cardFlipAndCheck);
-                        });
-
-                        pairsRemaining--;
-                        pairsRemainingContainer.innerHTML = pairsRemaining;
-
-                        if (pairsRemaining === 0) {
-                            gameWon(gameTime);
-                        }
-
-                    } else {
-                        elements.forEach(function (card) {
-                            card.classList.toggle("flip");
-                        });
-                    }
                 }
             }
 
-            function gameWon(timeRemaining) {
-                mask.classList.remove("hidden");
-                mask.firstElementChild.nextElementSibling.classList.remove("hidden");
-                timeRemainingContainer.innerHTML = timeRemaining;
+            function checkAttributes(elements) {
+                if (elements[0].getAttribute("card") === elements[1].getAttribute("card")) {
+
+                    increaseScore();
+
+                    elements.forEach(function (pair) {
+                        pair.classList.add("fade-out");
+                        pair.removeEventListener("click", cardFlipAndCheck);
+                    });
+
+                    pairsRemaining--;
+                    pairsRemainingContainer.innerHTML = pairsRemaining;
+
+                    if (pairsRemaining === 0) {
+                        endScoreContainer.innerHTML = score;
+                        gameEnd(true, gameTime);
+                    }
+
+                } else {
+                    decreaseScore();
+                    elements.forEach(function (card) {
+                        card.classList.toggle("flip");
+                    });
+                }
+            }
+
+            function gameEnd(gameWon, timeRemaining){
+                var gameWonCaption = mask.querySelector(".caption-game-won");
+                var gameLostCaption = mask.querySelector(".caption-game-lost");
+                show(mask);
+                if(gameWon){
+                    timeRemainingContainer.innerHTML = timeRemaining;
+                    show(gameWonCaption);
+                    hide(gameLostCaption);
+                    addToLeaderboardArray();
+                } else {
+                    hide(gameWonCaption);
+                    show(gameLostCaption);
+                }
                 clearInterval(int);
+            }
+
+            function decreaseScore(){
+                score -= 250;
+                updateScore();
+            }
+
+            function increaseScore(){
+                score += 500;
+                updateScore();
+            }
+
+            function updateScore(){
+                scoreContainer.innerHTML = score;
             }
 
             // Timer functionality
             var timer = document.getElementById('js-timer');
-            var gameTime = 60;
             timer.innerHTML = gameTime;
-            var mask = document.querySelector(".mask");
             var timeRemainingContainer = document.getElementById("js-time-remaining");
 
-            // Define interval variable here to give us access to it later
             var int;
 
-            function countDown(i) {
+            (function countDown(i) {
                 int = setInterval(function () {
                     i--;
-                    document.getElementById('js-timer').innerHTML = i;
+                    timer.innerHTML = i;
+
+                    score -= 51;
+                    updateScore();
 
                     // Need to track gameTime to output it when game is won
                     gameTime = i;
-
                     // Out of time if statement
                     if (i === 0) {
-                        clearInterval(int);
-                        mask.classList.remove("hidden");
-                        mask.firstElementChild.classList.remove("hidden");
+                        gameEnd();
                     }
                 }, 1000);
+            }(gameTime));
+
+            // Restart game functionality
+
+            var restartBtn = document.querySelectorAll(".js-restart");
+
+            for (var i = 0; i < restartBtn.length; i++) {
+                restartBtn[i].addEventListener("click", restartGame)
             }
 
-            countDown(gameTime);
+            function restartGame() {
+                hide(mask);
+                startGame(pairs, username);
+            }
 
-        }
+            var leaderboard = [];
 
-        startGame(pairs, true);
+            function addToLeaderboardArray(){
+                leaderboard.push({
+                    username: username,
+                    score: score,
+                    timeRemaining: gameTime
+                });
 
-        // Restart game functionality
+                updateLeaderboard();
+            }
 
-        var restartBtn = document.querySelectorAll(".js-restart");
+            var leaderboardRow = document.createElement('tr');
+            var tableFooter = document.querySelector('.table-footer');
+            var leaderboardTable = tableFooter.parentNode;
 
-        for (var i = 0; i < restartBtn.length; i++) {
-            restartBtn[i].addEventListener("click", restartGame)
-        }
+            function updateLeaderboard(){
+                var htmlString = "";
+                leaderboard.map(function(obj){
+                    htmlString = "<td>" + obj.username + "</td>" + "<td>" + obj.score +"</td><td>" + obj.timeRemaining + " Seconds</td>";
+                    return htmlString;
+                }).join("");
 
-        function restartGame(e) {
-            e.target.parentNode.parentNode.classList.add("hidden");
-            startGame(pairs, false);
+                leaderboardRow.innerHTML = htmlString;
+                leaderboardTable.insertBefore(leaderboardRow, tableFooter);
+
+            }
+
         }
 
     }
 
 };
+
+
 
 
 // Third-party shuffle array function
@@ -161,4 +231,12 @@ function shuffle(array) {
     }
 
     return array;
+}
+
+function hide(element){
+    element.classList.add("hidden");
+}
+
+function show(element){
+    element.classList.remove("hidden");
 }
