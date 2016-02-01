@@ -23,28 +23,6 @@ var pairsGame = {
 
         function startGame(pairs, username) {
 
-            // retrieve leaderboard from FB and build
-
-            var tableHeader = document.querySelector('.table-header');
-            var tableFooter = document.querySelector('.table-footer');
-            var leaderboardTable = tableHeader.parentNode;
-
-            leaderboardRef.orderByChild("score").once("value", function(snapshot){
-
-                var htmlString = ""
-
-                snapshot.forEach(function(data){
-                    var leaderboardRow = document.createElement('tr');
-                    htmlString = buildLeaderboard(data);
-                    leaderboardRow.innerHTML = htmlString;
-                    leaderboardTable.insertBefore(leaderboardRow, tableHeader.nextSibling);
-                });
-
-
-            });
-
-
-
             var mask = document.querySelector(".mask");
             hide(mask);
             hide(firstScreen);
@@ -59,7 +37,7 @@ var pairsGame = {
             var endScoreContainer = document.getElementById("js-end-score");
             updateScore();
 
-            var pairsRemaining = 1;
+            var pairsRemaining = pairs.length / 2;
             var pairsRemainingContainer = document.getElementById("js-pairs-remaining");
             pairsRemainingContainer.innerHTML = pairsRemaining;
 
@@ -196,26 +174,40 @@ var pairsGame = {
 
             function restartGame() {
                 hide(mask);
+
+                // remove leaderboard elements so it can be re-rendered later
+                var tbody = document.querySelector(".leaderboard-body");
+                var leaderboardRow = document.querySelectorAll(".leaderboard-row");
+                for(var i = 0; i < leaderboardRow.length; i++){
+                    tbody.removeChild(leaderboardRow[i]);
+                }
+
                 startGame(pairs, username);
             }
 
+            // Leaderboard functionality integrated with firebase
+
             function addToLeaderboardArray(){
-                var leaderboardObj = {
+                leaderboardRef.push( {
                     username: username,
                     score: score,
                     timeRemaining: gameTime
-                }
-                leaderboardRef.push(leaderboardObj);
-                updateLeaderboard();
+                });
+
+                setTimeout(updateLeaderboard, 300);
             }
 
+            var tableHeader = document.querySelector('.table-header');
+            var leaderboardTable = tableHeader.parentNode;
 
             function updateLeaderboard(){
-                var leaderboardRow = document.createElement('tr');
-                leaderboardRef.endAt().limitToLast(1).on("child_added", function(snapshot) {
-                    leaderboardRow.innerHTML = buildLeaderboard(snapshot);
+                leaderboardRef.orderByChild("score").on("child_added", function(snapshot) {
+                    var leaderboardRow = document.createElement('tr');
+                    leaderboardRow.classList.add("leaderboard-row");
+                    var htmlString = buildLeaderboard(snapshot);
+                    leaderboardRow.innerHTML = htmlString;
+                    leaderboardTable.insertBefore(leaderboardRow, tableHeader.nextSibling);
                 });
-                leaderboardTable.insertBefore(leaderboardRow, tableFooter);
             }
 
             function buildLeaderboard(snapshot){
